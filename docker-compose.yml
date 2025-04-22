@@ -20,6 +20,7 @@ services:
     command: -config.file=/etc/loki/loki-config.yaml
     volumes:
       - ./loki-config.yaml:/etc/loki/loki-config.yaml
+      - /loki:/loki
     networks:
       - observability
 
@@ -27,8 +28,13 @@ services:
     image: grafana/tempo:latest
     container_name: tempo
     ports:
-      - "5775:5775"
-      - "55680:55680"
+      - "3200:3200"       # porta HTTP para Tempo API (query, status)
+      - "44317:44317"       # OTLP gRPC
+      - "4318:4318"       # OTLP HTTP (se quiser adicionar também)
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml
+      - /tmp/tempo:/tmp/tempo
+    command: ["-config.file=/etc/tempo.yaml"]
     networks:
       - observability
 
